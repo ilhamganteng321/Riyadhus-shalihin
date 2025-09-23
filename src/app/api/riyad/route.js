@@ -5,7 +5,7 @@ export const runtime = 'edge';
 
 export async function GET() {
 try {
-  const db = env.DB as D1Database;
+  const db = env.DB;
   const { results } = await db.prepare('SELECT * FROM riyadhus_shalihin').all();
   return Response.json(results);
 } catch (error) {
