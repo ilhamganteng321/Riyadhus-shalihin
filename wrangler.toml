@@ -6,3 +6,5 @@ compatibility_date = "2025-09-23"
 binding = "DB" # ← nama variabel yang nanti dipakai di kode Worker
 database_name = "my_database"
 database_id = "fa74e784-7bd8-4535-861c-bfb9c21a4742"
+compatibility_flags = [ "nodejs_compat" ]
+
