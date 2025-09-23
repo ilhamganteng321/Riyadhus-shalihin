@@ -1,23 +1,24 @@
 import { NextResponse } from "next/server";
-import { getDatabase } from "../../../../lib/database";
+
+// 🔑 Penting: Edge runtime
+export const runtime = 'edge';
 
 export async function GET(request) {
-    const db = getDatabase();
-    try {
-        const stmt = db.prepare('SELECT * FROM riyadhus_shalihin');
-        const data = stmt.all();
-        return new NextResponse(JSON.stringify(data), {
-            status: 200,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-    } catch (error) {
-        return new NextResponse(JSON.stringify({ error: 'Internal Server Error',error }), {
-            status: 500,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-    }
+  try {
+    // Ambil binding D1 dari environment
+    const db = process.env.DB;   // ✅ tanpa "as any"
+
+    // Jalankan query
+    const { results } = await db.prepare(
+      'SELECT * FROM riyadhus_shalihin'
+    ).all();
+
+    return NextResponse.json(results, { status: 200 });
+  } catch (error) {
+    console.error("D1 Query Error:", error);
+    return NextResponse.json(
+      { error: 'Internal Server Error', detail: String(error) },
+      { status: 500 }
+    );
+  }
 }
