@@ -1,26 +1,20 @@
 import { NextResponse } from "next/server";
-// ✅ Import env dari modul cloudflare
-import { env } from "cloudflare:workers";
-
-export const runtime = "edge";
+import { getConnection } from "../../../../lib/database";
 
 export async function GET() {
-  try {
-    // Binding D1 database dari Cloudflare Pages
-    const db = env.DB;
+  const db = getConnection();
 
-    // Jalankan query
-    const { results } = await db.prepare(
-      "SELECT * FROM riyadhus_shalihin"
-    ).all();
-
-    // Return data sebagai JSON
-    return NextResponse.json(results, { status: 200 });
-  } catch (error) {
-    console.error("D1 Query Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error", detail: String(error) },
-      { status: 500 }
-    );
-  }
+  return new Promise((resolve) => {
+    db.all("SELECT * FROM riyadhus_shalihin", [], (err, rows) => {
+      if (err) {
+        console.error("DB Error:", err);
+        resolve(
+          NextResponse.json({ error: err.message }, { status: 500 })
+        );
+      } else {
+        // rows sudah berupa plain JS object -> bisa langsung
+        resolve(NextResponse.json(rows, { status: 200 }));
+      }
+    });
+  });
 }
